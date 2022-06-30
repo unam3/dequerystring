@@ -1,0 +1,26 @@
+name:                dequerystring
+version:             0.1.0.0
+
+dependencies:
+- base == 4.14.3.0
+
+ghc-options:
+- -Wall
+
+library:
+  source-dirs:      src
+
+tests:
+  dequerystring-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - dequerystring
+    - hspec    
+    - text
+    - time
+    - vector

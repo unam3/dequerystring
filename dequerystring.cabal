@@ -1,0 +1,39 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.34.4.
+--
+-- see: https://github.com/sol/hpack
+
+name:           dequerystring
+version:        0.1.0.0
+build-type:     Simple
+
+library
+  exposed-modules:
+      DeQueryString
+  other-modules:
+      Paths_dequerystring
+  hs-source-dirs:
+      src
+  ghc-options: -Wall
+  build-depends:
+      base ==4.14.3.0
+  default-language: Haskell2010
+
+test-suite dequerystring-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      DeQueryStringSpec
+      Paths_dequerystring
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base ==4.14.3.0
+    , dequerystring
+    , hspec
+    , text
+    , time
+    , vector
+  default-language: Haskell2010
