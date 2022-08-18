@@ -4,7 +4,8 @@ Like when you have QueryText ( https://hackage.haskell.org/package/http-types-0.
 
 Can it be possible with further constraints?
 
-1. Same field names.
+0. Works only with type that has one constructor.
+1. Same field names as in query string keys.
 2. Only first key-value pair from the left will be processed.
 
 
