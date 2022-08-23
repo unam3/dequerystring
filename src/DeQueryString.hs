@@ -6,7 +6,6 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 
 
@@ -71,9 +70,6 @@ data TestQueryStringRequest = TestQueryStringRequest
   } deriving (Eq, Show, FromQuery, Generic)
 
 {-
--- plain wrong TypeApplication use? (Either String TestQueryStringRequest)
-parseParams @TestQueryStringRequest queryString
-
 -- /wo TypeApplications
 -- (parseParams queryString) :: Either String TestQueryStringRequest
 -- Right (TestQueryStringRequest {pluh = 12, mah = "12", tags_ids = [1,2,3]})
