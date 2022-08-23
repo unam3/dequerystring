@@ -37,6 +37,9 @@ instance HasParse Int where
 instance HasParse Text where
   parse = Right
 
+--instance HasParse a => HasParse (Maybe a) where
+--  parse = Right . Just . parse
+
 instance HasParse a => HasParse (Vector a) where
   parse = fmap V.fromList . traverse parse . T.splitOn ","  . T.dropEnd 1 . T.drop 1 
   -- can't be arsed to write a proper parser
@@ -44,7 +47,7 @@ instance HasParse a => HasParse (Vector a) where
 instance GFromQuery x => GFromQuery (D1 a (C1 b x)) where
   gparseParams = fmap (M1 . M1) . gparseParams
 
--- some use of DataKinds quotes?
+-- ' for https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/data_kinds.html#distinguishing-between-types-and-constructors
 instance forall x y a b c d. (KnownSymbol x, HasParse y) => GFromQuery (S1 ('MetaSel ('Just x) a b c) (K1 d y)) where
     gparseParams params = case lookup (T.pack fieldName) params of
       Nothing -> Left $ "Couldn't find field " <> fieldName
