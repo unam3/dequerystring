@@ -1,6 +1,5 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DefaultSignatures #-}
-{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
@@ -58,19 +57,3 @@ instance forall x y a b c d. (KnownSymbol x, HasParse y) => GFromQuery (S1 ('Met
 
 instance (GFromQuery x, GFromQuery y) => GFromQuery (x :*: y) where
   gparseParams params = (:*:) <$> gparseParams params <*> gparseParams params
-
-
-queryString :: [(Text, Maybe Text)]
-queryString = [("author_id", Just "12"), ("author_id", Nothing), ("abyr", Nothing), ("ad", Nothing), ("abyr", Just "Valg3"), ("meh", Nothing), ("tags_ids", Just "[1,2,3]"), ("pluh", Just "12"), ("mah", Just "12")]
-
-data TestQueryStringRequest = TestQueryStringRequest
-  { pluh     :: Int
-  , mah      :: Text
-  , tags_ids :: Vector Int
-  } deriving (Eq, Show, FromQuery, Generic)
-
-{-
--- /wo TypeApplications
--- (parseParams queryString) :: Either String TestQueryStringRequest
--- Right (TestQueryStringRequest {pluh = 12, mah = "12", tags_ids = [1,2,3]})
--}
