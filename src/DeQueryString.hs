@@ -4,6 +4,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeOperators #-}
 
@@ -15,7 +16,7 @@ import Data.Vector (Vector)
 import qualified Data.Vector as V
 import Text.Read
 import qualified Data.Text as T
-import Data.Text (Text)
+import Data.Text (Text, unpack)
 import GHC.Generics
 import GHC.TypeLits
 
@@ -37,8 +38,10 @@ instance HasParse Int where
 instance HasParse Text where
   parse = Right
 
---instance HasParse a => HasParse (Maybe a) where
---  parse = Right . Just . parse
+instance HasParse a => HasParse (Maybe a) where
+  parse textRepresentation = case parse textRepresentation of
+    Right sth -> Right $ Just sth
+    Left errorS -> Left $ mconcat (["error while parsing \"", unpack textRepresentation, "\": ", errorS])
 
 instance HasParse a => HasParse (Vector a) where
   parse = fmap V.fromList . traverse parse . T.splitOn ","  . T.dropEnd 1 . T.drop 1 
@@ -48,15 +51,16 @@ instance GFromQuery x => GFromQuery (D1 a (C1 b x)) where
   gparseParams = fmap (M1 . M1) . gparseParams
 
 -- ' for https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/data_kinds.html#distinguishing-between-types-and-constructors
-instance forall x y a b c d. (KnownSymbol x, HasParse y) => GFromQuery (S1 ('MetaSel ('Just x) a b c) (K1 d y)) where
+instance forall x y a b c d. (KnownSymbol x, KnownSymbol y, HasParse y) => GFromQuery (S1 ('MetaSel ('Just x) a b c) (K1 d y)) where
     gparseParams params = case lookup (T.pack fieldName) params of
       Nothing -> Left $ "Couldn't find field " <> fieldName
-      Just Nothing -> Left $ "Missing value for field " <> fieldName
+      Just Nothing -> Left $ "Missing value for field " <> fieldName <> " of type " <> constName
       Just (Just val) -> do
         fieldVal <- parse val
         pure $ M1 $ K1 fieldVal
 
       where fieldName = symbolVal (Proxy :: Proxy x)
+            constName = symbolVal (Proxy :: Proxy y)
 
 instance (GFromQuery x, GFromQuery y) => GFromQuery (x :*: y) where
   gparseParams params = (:*:) <$> gparseParams params <*> gparseParams params
